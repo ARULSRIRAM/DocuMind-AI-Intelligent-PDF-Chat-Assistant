@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, session
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 import pickle
 import faiss
 import numpy as np
@@ -16,8 +17,16 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app = Flask(__name__)
 app.secret_key = "chatbot_secret_key_2026"
 
-model = SentenceTransformer("all-MiniLM-L6-v2") 
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))# Replace with your actual key
+# 🔥 Lazy load model
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 texts = []
 index = None
@@ -63,8 +72,10 @@ def upload():
     with open("kb.pkl", "wb") as f:
         pickle.dump(texts, f)
 
-    emb = model.encode(texts)
+    # 🔥 Use lazy loaded model
+    emb = get_model().encode(texts)
     dim = emb.shape[1]
+
     index = faiss.IndexFlatL2(dim)
     index.add(np.array(emb).astype("float32"))
     faiss.write_index(index, "kb.index")
@@ -83,11 +94,13 @@ def ask():
     # Load knowledge base
     with open("kb.pkl", "rb") as f:
         texts = pickle.load(f)
+
     index = faiss.read_index("kb.index")
 
-    # Search PDF
-    q_emb = model.encode([question])
+    # 🔥 Use lazy loaded model
+    q_emb = get_model().encode([question])
     _, I = index.search(np.array(q_emb).astype("float32"), k=3)
+
     context = "\n".join([texts[i] for i in I[0]])
 
     prompt = f"""
@@ -111,7 +124,6 @@ Question: {question}
 
     answer = response.choices[0].message.content
 
-    # Save chat history
     if "chat" not in session:
         session["chat"] = []
 
@@ -121,6 +133,7 @@ Question: {question}
 
     return render_template("index.html", chat=session["chat"], filename=session.get("filename"))
 
+# 🔥 Proper port binding for Render
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
