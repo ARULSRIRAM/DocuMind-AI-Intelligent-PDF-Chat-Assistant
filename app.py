@@ -122,4 +122,4 @@ Question: {question}
     return render_template("index.html", chat=session["chat"], filename=session.get("filename"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
