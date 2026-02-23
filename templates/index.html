@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DocuMind AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Markdown renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-logo">🤖 DocuMind AI</div>
+
+        <div class="sidebar-section">
+            <h2>📂 Upload PDF</h2>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <label class="file-label">
+                    <input type="file" name="pdf" required>
+                    <span class="file-btn">📎 Choose File</span>
+                </label>
+                <button type="submit" class="upload-btn">⬆ Upload PDF</button>
+            </form>
+
+            {% if msg %}
+            <p class="success">{{ msg }}</p>
+            {% endif %}
+
+            {% if filename %}
+            <p class="filename">📄 {{ filename }}</p>
+            {% endif %}
+        </div>
+
+        <a href="/reset" class="clear-btn">🗑 Clear Chat</a>
+    </div>
+
+
+    <!-- CHAT AREA -->
+    <div class="chatbox">
+
+        <div class="chat-header">
+            <h1>💬 Chat with your PDF</h1>
+            <p class="subtext">Upload a PDF and ask any question about it.</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            {% if not chat %}
+            <div class="empty-state">
+                <div class="empty-icon">📄</div>
+                <p>No conversation yet. Upload a PDF and start asking!</p>
+            </div>
+            {% endif %}
+
+            {% for c in chat %}
+                {% if c.role == "user" %}
+                <div class="message-row user-row">
+                    <div class="avatar user-avatar">You</div>
+                    <div class="chat user">{{ c.msg }}</div>
+                </div>
+                {% else %}
+                <div class="message-row bot-row">
+                    <div class="avatar bot-avatar">🤖</div>
+                    <div class="chat bot markdown-body" data-raw="{{ c.msg }}">{{ c.msg }}</div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <form action="/ask" method="post" class="chat-input">
+            <input type="text" name="question" placeholder="Ask something about your PDF..." required>
+            <button type="submit">
+                <span>Send</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    // Render markdown for all bot messages
+    document.querySelectorAll('.bot.markdown-body').forEach(el => {
+        const raw = el.getAttribute('data-raw') || el.innerText;
+        el.innerHTML = marked.parse(raw);
+    });
+
+    // Auto-scroll to bottom
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
