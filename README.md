@@ -49,3 +49,92 @@ This follows the **Retrieval-Augmented Generation (RAG)** approach.
 ```bash
 git clone https://github.com/ARULSRIRAM/DocuMind-AI-Intelligent-PDF-Chat-Assistant.git
 cd DocuMind-AI-Intelligent-PDF-Chat-Assistant
+```
+
+2️⃣ Create Virtual Environment
+      
+ - python -m venv venv
+
+Activate it:
+
+Windows:
+
+ - venv\Scripts\activate
+
+macOS/Linux:
+
+ - source venv/bin/activate
+
+3️⃣ Install Dependencies
+
+ - pip install -r requirements.txt
+
+🔐 Environment Variables Setup :
+
+Create a file named .env in the project root directory and add:
+
+GROQ_API_KEY=your_api_key_here
+
+Make sure .env is included in .gitignore to keep your API key secure.
+
+▶️ Run the Application
+- python app.py
+
+Open your browser and visit:
+
+  http://127.0.0.1:5000
+
+  
+🌍 Deployment
+
+This application can be deployed on:
+
+Render
+
+Railway
+
+Replit
+
+Any VPS using Gunicorn
+
+
+📁 Project Structure
+
+DocuMind-AI-Intelligent-PDF-Chat-Assistant/
+│
+
+├── app.py
+
+├── requirements.txt
+
+├── README.md
+
+├── .gitignore
+
+├── templates/
+
+│   └── index.html
+
+├── static/
+
+├── uploads/ (ignored)
+
+├── kb.index (ignored)
+
+├── kb.pkl (ignored)
+
+└── .env (ignored)
+
+📌 Future Enhancements
+
+Persistent vector database (e.g., Pinecone, Weaviate)
+
+User authentication system
+
+Multi-document support
+
+Improved UI/UX design
+
+Streaming LLM responses
+
+Cloud storage integration
