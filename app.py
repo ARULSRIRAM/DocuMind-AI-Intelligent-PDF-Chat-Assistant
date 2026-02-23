@@ -6,7 +6,6 @@ load_dotenv()
 import pickle
 import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from PyPDF2 import PdfReader
 from groq import Groq
 
@@ -23,6 +22,7 @@ model = None
 def get_model():
     global model
     if model is None:
+        from sentence_transformers import SentenceTransformer
         model = SentenceTransformer("all-MiniLM-L6-v2")
     return model
 
