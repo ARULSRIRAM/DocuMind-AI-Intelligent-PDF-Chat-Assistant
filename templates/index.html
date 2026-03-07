@@ -1,67 +1,294 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>DocuMind AI</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <!-- Markdown renderer -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Circular Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}?v=2">
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+    width: 260px;
+    background: #e9eef5;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid #d0d7e2;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #1f3a8a;
+    margin-bottom: 30px;
+}
+
+/* Circular Main Logo */
+.main-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #1f3a8a;
+}
+
+/* Upload Section */
+.sidebar-section h2 {
+    font-size: 14px;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    color: #34495e;
+}
+
+.file-label input[type="file"] {
+    display: none;
+}
+
+.file-btn {
+    display: block;
+    padding: 12px;
+    border-radius: 6px;
+    background: #3498db;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.file-btn:hover {
+    background: #2980b9;
+}
+
+.success {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    background: #d4edda;
+    color: #155724;
+    font-weight: 600;
+}
+
+.filename {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.clear-btn {
+    background: #e74c3c;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.clear-btn:hover {
+    background: #c0392b;
+}
+
+/* ===== CHAT AREA ===== */
+
+.chatbox {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f0f2f5;
+}
+
+.chat-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    background: white;
+}
+
+.chat-header h1 {
+    margin: 0;
+    font-size: 22px;
+    color: #2c3e50;
+}
+
+.subtext {
+    font-size: 14px;
+    color: #666;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: white;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* MESSAGE ROWS */
+
+.message-row {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: flex-start;
+}
+
+.user-row {
+    justify-content: flex-end;
+}
+
+.bot-row {
+    justify-content: flex-start;
+}
+
+/* Circular Avatar */
+.avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Chat Bubbles */
+
+.chat {
+    max-width: 60%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.chat.user {
+    background: #3498db;
+    color: white;
+}
+
+.chat.bot {
+    background: #e4e6eb;
+    color: black;
+}
+
+/* INPUT */
+
+.chat-input {
+    display: flex;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    background: white;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.chat-input button {
+    margin-left: 10px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    background: #3498db;
+    color: white;
+    cursor: pointer;
+}
+
+.chat-input button:hover {
+    background: #2980b9;
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <div class="sidebar-logo">🤖 DocuMind AI</div>
 
-        <div class="sidebar-section">
-            <h2>📂 Upload PDF</h2>
-            <form action="/upload" method="post" enctype="multipart/form-data">
-                <label class="file-label">
-                    <input type="file" name="pdf" required>
-                    <span class="file-btn">📎 Choose File</span>
-                </label>
-                <button type="submit" class="upload-btn">⬆ Upload PDF</button>
-            </form>
+        <div>
+            <div class="sidebar-logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" class="main-logo">
+                <span>DocuMind AI</span>
+            </div>
 
-            {% if msg %}
-            <p class="success">{{ msg }}</p>
-            {% endif %}
+            <div class="sidebar-section">
+                <h2>Upload PDF</h2>
 
-            {% if filename %}
-            <p class="filename">📄 {{ filename }}</p>
-            {% endif %}
+                <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <label class="file-label">
+                        <input type="file" name="pdf" id="pdfInput" required>
+                        <span class="file-btn">Select PDF</span>
+                    </label>
+                </form>
+
+                {% if msg %}
+                <div class="success">✔ {{ msg }}</div>
+                {% endif %}
+
+                {% if filename %}
+                <div class="filename">Uploaded: {{ filename }}</div>
+                {% endif %}
+            </div>
         </div>
 
-        <a href="/reset" class="clear-btn">🗑 Clear Chat</a>
+        <a href="/reset" class="clear-btn">Clear Chat</a>
     </div>
-
 
     <!-- CHAT AREA -->
     <div class="chatbox">
 
         <div class="chat-header">
-            <h1>💬 Chat with your PDF</h1>
+            <h1>Chat with your PDF</h1>
             <p class="subtext">Upload a PDF and ask any question about it.</p>
         </div>
 
         <div class="chat-messages" id="chatMessages">
+
             {% if not chat %}
-            <div class="empty-state">
-                <div class="empty-icon">📄</div>
-                <p>No conversation yet. Upload a PDF and start asking!</p>
-            </div>
+            <p style="text-align:center;">No conversation yet. Upload a PDF and start asking!</p>
             {% endif %}
 
             {% for c in chat %}
                 {% if c.role == "user" %}
                 <div class="message-row user-row">
-                    <div class="avatar user-avatar">You</div>
                     <div class="chat user">{{ c.msg }}</div>
                 </div>
                 {% else %}
                 <div class="message-row bot-row">
-                    <div class="avatar bot-avatar">🤖</div>
+                    <div class="avatar">
+                        <img src="{{ url_for('static', filename='logo.png') }}">
+                    </div>
                     <div class="chat bot markdown-body" data-raw="{{ c.msg }}">{{ c.msg }}</div>
                 </div>
                 {% endif %}
@@ -70,10 +297,7 @@
 
         <form action="/ask" method="post" class="chat-input">
             <input type="text" name="question" placeholder="Ask something about your PDF..." required>
-            <button type="submit">
-                <span>Send</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
+            <button type="submit">Send</button>
         </form>
 
     </div>
@@ -81,17 +305,24 @@
 </div>
 
 <script>
-    // Render markdown for all bot messages
-    document.querySelectorAll('.bot.markdown-body').forEach(el => {
-        const raw = el.getAttribute('data-raw') || el.innerText;
-        el.innerHTML = marked.parse(raw);
-    });
+document.querySelectorAll('.markdown-body').forEach(el => {
+    const raw = el.getAttribute('data-raw') || el.innerText;
+    el.innerHTML = marked.parse(raw);
+});
 
-    // Auto-scroll to bottom
-    const chatMessages = document.getElementById('chatMessages');
-    if (chatMessages) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+const chatMessages = document.getElementById('chatMessages');
+if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+const pdfInput = document.getElementById("pdfInput");
+const uploadForm = document.getElementById("uploadForm");
+
+pdfInput.addEventListener("change", function() {
+    if (this.files.length > 0) {
+        uploadForm.submit();
     }
+});
 </script>
 
 </body>
